@@ -13,29 +13,40 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
 
   late AnimationController _controller;
-  late Animation<double> _opacityAnimation;
+  late Animation<double> _fadeAnimation;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
 
-    // Fade animation
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 2),
+      duration: const Duration(milliseconds: 1500),
     );
 
-    _opacityAnimation =
-        Tween<double>(begin: 0, end: 1).animate(_controller);
+    _fadeAnimation =
+        CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+
+    _scaleAnimation =
+        Tween<double>(begin: 0.9, end: 1.0).animate(
+          CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+        );
 
     _controller.forward();
 
-    // Navigate after 2.5 seconds
-    Timer(const Duration(seconds: 6), () {
+    Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => const HomeScreen(),
+        PageRouteBuilder(
+          transitionDuration: const Duration(milliseconds: 600),
+          pageBuilder: (_, __, ___) => const HomeScreen(),
+          transitionsBuilder: (_, animation, __, child) {
+            return FadeTransition(
+              opacity: animation,
+              child: child,
+            );
+          },
         ),
       );
     });
@@ -49,36 +60,43 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
       body: Container(
         width: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              theme.colorScheme.primary.withOpacity(0.08),
-              Colors.white,
+              Color(0xFFFF8C00),   // Deep orange
+              Color(0xFFFFB347),   // Soft orange
             ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
         ),
-        child: FadeTransition(
-          opacity: _opacityAnimation,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'assets/images/dishway_logo.png',
-                height: 200,
+        child: Center(
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: ScaleTransition(
+              scale: _scaleAnimation,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    "assets/images/dishway_logo.png",
+                    height: 140,
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    "Find food before you stop",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 24),
-              Text(
-                "Explore food before you stop",
-                style: theme.textTheme.bodyMedium,
-              ),
-            ],
+            ),
           ),
         ),
       ),
