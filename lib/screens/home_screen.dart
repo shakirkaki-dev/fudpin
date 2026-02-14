@@ -1,5 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../data/dummy_data.dart';
+import '../models/food_item.dart';
 import 'results_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -10,8 +12,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final TextEditingController _searchController = TextEditingController();
 
+  String? _selectedFood;
   String _selectedDistance = "5 km";
 
   final List<String> _distances = [
@@ -21,6 +23,20 @@ class _HomeScreenState extends State<HomeScreen> {
     "15 km",
   ];
 
+  // 🔥 Extract unique food names
+  List<String> get _foodSuggestions {
+    final List<String> names = [];
+
+    for (var restaurant in dummyRestaurants) {
+      names.add(restaurant.searchedFood.name);
+      for (var item in restaurant.otherItems) {
+        names.add(item.name);
+      }
+    }
+
+    return names.toSet().toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           children: [
 
-            /// 🔥 HERO SECTION
+            /// 🔥 HERO SECTION (unchanged)
             Container(
               height: 270,
               width: double.infinity,
@@ -68,28 +84,20 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            /// 🔥 BODY SECTION
+            /// 🔥 BODY
             Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 30,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
 
-                  /// 🔎 SEARCH LABEL
                   const Text(
                     "Search food",
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                   ),
-
                   const SizedBox(height: 8),
 
-                  /// 🔎 SEARCH FIELD
+                  /// 🔥 AUTOCOMPLETE FIELD
                   Container(
                     height: 58,
                     decoration: BoxDecoration(
@@ -100,32 +108,43 @@ class _HomeScreenState extends State<HomeScreen> {
                         width: 1.2,
                       ),
                     ),
-                    child: TextField(
-                      controller: _searchController,
-                      decoration: const InputDecoration(
-                        hintText: "Eg: Biryani, Pizza...",
-                        prefixIcon: Icon(Icons.search),
-                        border: InputBorder.none,
-                        contentPadding:
-                            EdgeInsets.symmetric(vertical: 16),
-                      ),
+                    child: Autocomplete<String>(
+                      optionsBuilder: (TextEditingValue textEditingValue) {
+                        if (textEditingValue.text.isEmpty) {
+                          return const Iterable<String>.empty();
+                        }
+                        return _foodSuggestions.where((food) =>
+                            food.toLowerCase().contains(
+                                textEditingValue.text.toLowerCase()));
+                      },
+                      onSelected: (selection) {
+                        _selectedFood = selection;
+                      },
+                      fieldViewBuilder:
+                          (context, controller, focusNode, onEditingComplete) {
+                        return TextField(
+                          controller: controller,
+                          focusNode: focusNode,
+                          decoration: const InputDecoration(
+                            hintText: "Eg: Biryani, Pizza...",
+                            prefixIcon: Icon(Icons.search),
+                            border: InputBorder.none,
+                            contentPadding:
+                                EdgeInsets.symmetric(vertical: 16),
+                          ),
+                        );
+                      },
                     ),
                   ),
 
                   const SizedBox(height: 24),
 
-                  /// 📍 DISTANCE LABEL
                   const Text(
                     "Search within distance",
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                   ),
-
                   const SizedBox(height: 8),
 
-                  /// 📍 DISTANCE FIELD
                   Container(
                     height: 58,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -165,14 +184,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 56,
                     child: ElevatedButton(
                       onPressed: () {
-                        final enteredFood =
-                            _searchController.text.trim();
 
-                        if (enteredFood.isEmpty) {
+                        if (_selectedFood == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content:
-                                  Text("Please enter a food item"),
+                              content: Text(
+                                  "Please select a food item from suggestions"),
                             ),
                           );
                           return;
@@ -182,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => ResultsScreen(
-                              food: enteredFood,
+                              food: _selectedFood!,
                               distance: _selectedDistance,
                             ),
                           ),
@@ -191,8 +208,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.orange,
                         shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
                       child: const Text(

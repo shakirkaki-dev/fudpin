@@ -12,210 +12,324 @@ class RestaurantDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final FoodItem searchedFood = restaurant.searchedFood;
-    final List<FoodItem> otherFoods = restaurant.otherItems;
+    final FoodItem food = restaurant.searchedFood;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(restaurant.name),
-      ),
+      backgroundColor: const Color(0xFFF6F6F6),
 
-      // ===== BODY =====
       body: Column(
         children: [
-          // ===== SCROLLABLE CONTENT =====
+
+          /// 🔥 HEADER
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(20, 55, 20, 30),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFFF59E0B),
+                  Color(0xFFFB923C),
+                ],
+              ),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(26),
+                bottomRight: Radius.circular(26),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: const Icon(
+                    Icons.arrow_back_ios_new,
+                    color: Colors.white,
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                Text(
+                  restaurant.name,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 6),
+
+                Text(
+                  restaurant.address,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                  ),
+                ),
+
+                const SizedBox(height: 6),
+
+                Text(
+                  "${restaurant.distanceKm} km away",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          /// 🔥 BODY
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(18),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ===== RESTAURANT HEADER =====
-                  Text(
-                    restaurant.name,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    "${restaurant.address} • ${restaurant.distanceKm} km",
-                    style: const TextStyle(color: Colors.grey),
-                  ),
 
-                  const SizedBox(height: 24),
-
-                  // ===== SEARCHED FOOD (PRIMARY) =====
-                  const Text(
-                    "Your searched food",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-
+                  /// 🍽 MAIN FOOD NAME
                   Text(
-                    searchedFood.name,
+                    food.name,
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 6),
 
-                  Row(
-                    children: [
-                      Text(
-                        "₹${searchedFood.price}",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Icon(
-                        searchedFood.isAvailable
-                            ? Icons.check_circle
-                            : Icons.cancel,
-                        color: searchedFood.isAvailable
-                            ? Colors.green
-                            : Colors.red,
-                        size: 18,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        searchedFood.isAvailable
-                            ? "Available today"
-                            : "Not available today",
-                        style: TextStyle(
-                          color: searchedFood.isAvailable
-                              ? Colors.green
-                              : Colors.red,
-                        ),
-                      ),
-                    ],
-                  ),
+                  const SizedBox(height: 16),
 
-                  const SizedBox(height: 8),
-                  Text("⭐ ${searchedFood.rating}"),
-
-                  const SizedBox(height: 12),
+                  /// 💰 VARIANTS SECTION
                   const Text(
-                    "Variants",
+                    "Available Variants",
                     style: TextStyle(fontWeight: FontWeight.w600),
                   ),
-                  const SizedBox(height: 4),
-                  ...searchedFood.variants.map((v) {
-                    return Text("• $v");
-                  }).toList(),
 
-                  const SizedBox(height: 12),
-                  Text(searchedFood.description),
+                  const SizedBox(height: 10),
 
-                  const SizedBox(height: 32),
-
-                  // ===== OTHER ITEMS =====
-                  const Text(
-                    "Other items available",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
+                  ...food.variants.map(
+                    (variant) => Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Row(
+                        mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(variant.name),
+                          Text(
+                            "₹${variant.price}",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 12),
 
-                  ...otherFoods.map((food) {
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 12),
+                  const SizedBox(height: 20),
+
+                  /// 📋 FOOD SPECIFICATIONS
+                  const Text(
+                    "Food Details",
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  ...food.specifications.map(
+                    (spec) => Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Row(
+                        mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            spec.label,
+                            style: const TextStyle(
+                              color: Colors.grey,
+                            ),
+                          ),
+                          Text(
+                            spec.value,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  /// 📝 DESCRIPTION
+                  Text(
+                    food.description,
+                    style:
+                        TextStyle(color: Colors.grey[700]),
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  /// 🍽 OTHER MENU SECTION
+                  const Text(
+                    "Other Menu in Hotel",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  ...restaurant.otherItems.map(
+                    (item) => Container(
+                      margin:
+                          const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius:
+                            BorderRadius.circular(14),
+                        boxShadow: [
+                          BoxShadow(
+                            color:
+                                Colors.black.withOpacity(0.04),
+                            blurRadius: 6,
+                          ),
+                        ],
+                      ),
                       child: ListTile(
-                        title: Text(food.name),
-                        subtitle: Text("₹${food.price}"),
-                        trailing: Icon(
-                          food.isAvailable
-                              ? Icons.check_circle
-                              : Icons.cancel,
-                          color: food.isAvailable
-                              ? Colors.green
-                              : Colors.red,
+                        title: Text(item.name),
+                        subtitle: Text(
+                          "Starting from ₹${item.variants.first.price}",
+                        ),
+                        trailing: const Icon(
+                          Icons.arrow_forward_ios,
+                          size: 16,
                         ),
                         onTap: () {
-                          showFoodBottomSheet(context, food);
+                          _showFoodDetails(context, item);
                         },
                       ),
-                    );
-                  }).toList(),
+                    ),
+                  ),
+
+                  const SizedBox(height: 80),
                 ],
               ),
             ),
           ),
+        ],
+      ),
 
-          // ===== FIXED GET DIRECTIONS BUTTON =====
-          Container(
-            padding: const EdgeInsets.all(16),
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () {
-                // Later: Google Maps integration
-              },
-              icon: const Icon(Icons.directions),
-              label: const Text("Get Directions"),
+      /// 🔥 BOTTOM NAV BUTTON
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFF59E0B),
+            padding:
+                const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius:
+                  BorderRadius.circular(14),
             ),
           ),
-        ],
+          onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content:
+                    Text("Navigation feature coming soon"),
+              ),
+            );
+          },
+          child: const Text(
+            "Navigate to Restaurant",
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
       ),
     );
   }
 
-  // ===== BOTTOM SHEET =====
-  void showFoodBottomSheet(BuildContext context, FoodItem food) {
+  /// 🔥 BOTTOM SHEET DETAILS
+  void _showFoodDetails(
+      BuildContext context, FoodItem item) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (_) {
         return Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                food.name,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text("Price: ₹${food.price}"),
-              const SizedBox(height: 8),
-              Text(
-                food.isAvailable
-                    ? "Available today"
-                    : "Not available today",
-                style: TextStyle(
-                  color: food.isAvailable
-                      ? Colors.green
-                      : Colors.red,
-                ),
-              ),
-              const SizedBox(height: 12),
+          padding: const EdgeInsets.all(20),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
+              children: [
 
-              const Text(
-                "Variants",
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 4),
-              ...food.variants.map((v) {
-                return Text("• $v");
-              }).toList(),
+                Text(
+                  item.name,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
 
-              const SizedBox(height: 12),
-              Text(food.description),
-            ],
+                const SizedBox(height: 16),
+
+                ...item.variants.map(
+                  (variant) => Padding(
+                    padding:
+                        const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(variant.name),
+                        Text(
+                          "₹${variant.price}",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                ...item.specifications.map(
+                  (spec) => Padding(
+                    padding:
+                        const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(spec.label),
+                        Text(
+                          spec.value,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                Text(item.description),
+              ],
+            ),
           ),
         );
       },

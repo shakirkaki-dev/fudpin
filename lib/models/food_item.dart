@@ -1,17 +1,20 @@
+import 'food_variant.dart';
+import 'food_specification.dart';
+
 class FoodItem {
   final String name;
-  final double price;
+  final List<FoodVariant> variants;
+  final List<FoodSpecification> specifications;
   final bool isAvailable;
   final double rating;
   final String description;
-  final List<String> variants;
 
   FoodItem({
     required this.name,
-    required this.price,
+    required this.variants,
+    required this.specifications,
     required this.isAvailable,
     required this.rating,
     required this.description,
-    required this.variants,
   });
 }

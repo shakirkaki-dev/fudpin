@@ -1,41 +1,39 @@
 import '../models/food_item.dart';
+import '../models/food_variant.dart';
+import '../models/food_specification.dart';
 import '../models/restaurant.dart';
 
 final FoodItem biriyani = FoodItem(
   name: 'Chicken Biriyani',
-  price: 180,
   isAvailable: true,
   rating: 4.3,
-  description: 'Traditional Malabar style biriyani.',
-  variants: ['Full', 'Half'],
+  description: 'Traditional Malabar slow-cooked biriyani.',
+  variants: [
+    FoodVariant(name: 'Full', price: 180),
+    FoodVariant(name: 'Half', price: 120),
+  ],
+  specifications: [
+    FoodSpecification(label: 'Rice Type', value: 'Jeerakasala'),
+    FoodSpecification(label: 'Chicken Type', value: 'Fried'),
+    FoodSpecification(label: 'Served In', value: 'Banana Leaf'),
+    FoodSpecification(label: 'Raita', value: 'Available'),
+  ],
 );
 
 final FoodItem friedRice = FoodItem(
   name: 'Chicken Fried Rice',
-  price: 150,
   isAvailable: true,
   rating: 4.0,
   description: 'Classic Indo-Chinese fried rice.',
-  variants: [],
+  variants: [
+    FoodVariant(name: 'Regular', price: 150),
+  ],
+  specifications: [
+    FoodSpecification(label: 'Rice Type', value: 'Basmati'),
+    FoodSpecification(label: 'Chicken Type', value: 'Boneless'),
+    FoodSpecification(label: 'Spice Level', value: 'Medium'),
+  ],
 );
-final FoodItem beefFry = FoodItem(
-  name: 'Beef Fry',
-  price: 220,
-  isAvailable: true,
-  rating: 4.2,
-  description: 'Spicy Kerala style beef fry with coconut slices.',
-  variants: ['Normal'],
-);
-
-final FoodItem gheeRice = FoodItem(
-  name: 'Ghee Rice',
-  price: 140,
-  isAvailable: true,
-  rating: 4.1,
-  description: 'Aromatic ghee rice with cashews and raisins.',
-  variants: ['Single'],
-);
-
 
 final List<Restaurant> dummyRestaurants = [
   Restaurant(
@@ -45,20 +43,4 @@ final List<Restaurant> dummyRestaurants = [
     searchedFood: biriyani,
     otherItems: [friedRice],
   ),
-  Restaurant(
-  name: 'Paragon Restaurant',
-  address: 'SM Street, Kozhikode',
-  distanceKm: 3.1,
-  searchedFood: biriyani,
-  otherItems: [beefFry, gheeRice],
- ),
-
- Restaurant(
-  name: 'Top Form',
-  address: 'Beach Road, Kozhikode',
-  distanceKm: 4.0,
-  searchedFood: biriyani,
-  otherItems: [friedRice, gheeRice],
- ),
-
 ];
