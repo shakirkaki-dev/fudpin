@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../data/dummy_data.dart';
-import '../models/food_item.dart';
+import '../services/api_service.dart';
 import 'results_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,6 +15,8 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _selectedFood;
   String _selectedDistance = "5 km";
 
+  final TextEditingController _foodController = TextEditingController();
+
   final List<String> _distances = [
     "2 km",
     "5 km",
@@ -23,18 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
     "15 km",
   ];
 
-  // 🔥 Extract unique food names
-  List<String> get _foodSuggestions {
-    final List<String> names = [];
-
-    for (var restaurant in dummyRestaurants) {
-      names.add(restaurant.searchedFood.name);
-      for (var item in restaurant.otherItems) {
-        names.add(item.name);
-      }
-    }
-
-    return names.toSet().toList();
+  double _extractDistanceValue(String distanceText) {
+    return double.parse(distanceText.split(" ")[0]);
   }
 
   @override
@@ -45,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           children: [
 
-            /// 🔥 HERO SECTION (unchanged)
+            /// 🔥 HERO SECTION
             Container(
               height: 270,
               width: double.infinity,
@@ -97,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 8),
 
-                  /// 🔥 AUTOCOMPLETE FIELD
+                  /// 🔥 TEXT FIELD (Now normal input, backend will validate)
                   Container(
                     height: 58,
                     decoration: BoxDecoration(
@@ -108,31 +99,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         width: 1.2,
                       ),
                     ),
-                    child: Autocomplete<String>(
-                      optionsBuilder: (TextEditingValue textEditingValue) {
-                        if (textEditingValue.text.isEmpty) {
-                          return const Iterable<String>.empty();
-                        }
-                        return _foodSuggestions.where((food) =>
-                            food.toLowerCase().contains(
-                                textEditingValue.text.toLowerCase()));
-                      },
-                      onSelected: (selection) {
-                        _selectedFood = selection;
-                      },
-                      fieldViewBuilder:
-                          (context, controller, focusNode, onEditingComplete) {
-                        return TextField(
-                          controller: controller,
-                          focusNode: focusNode,
-                          decoration: const InputDecoration(
-                            hintText: "Eg: Biryani, Pizza...",
-                            prefixIcon: Icon(Icons.search),
-                            border: InputBorder.none,
-                            contentPadding:
-                                EdgeInsets.symmetric(vertical: 16),
-                          ),
-                        );
+                    child: TextField(
+                      controller: _foodController,
+                      decoration: const InputDecoration(
+                        hintText: "Eg: Biryani, Pizza...",
+                        prefixIcon: Icon(Icons.search),
+                        border: InputBorder.none,
+                        contentPadding:
+                            EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      onChanged: (value) {
+                        _selectedFood = value;
                       },
                     ),
                   ),
@@ -178,32 +155,48 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   const SizedBox(height: 32),
 
-                  /// 🔥 CTA BUTTON
+                  /// 🔥 CTA BUTTON (Backend Call Here)
                   SizedBox(
                     width: double.infinity,
                     height: 56,
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
 
-                        if (_selectedFood == null) {
+                        if (_selectedFood == null || _selectedFood!.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text(
-                                  "Please select a food item from suggestions"),
+                              content: Text("Please enter a food name"),
                             ),
                           );
                           return;
                         }
 
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ResultsScreen(
-                              food: _selectedFood!,
-                              distance: _selectedDistance,
+                        try {
+                          final results = await ApiService.searchFood(
+                            query: _selectedFood!,
+                            latitude: 12.9716,  // TEMP Bangalore
+                            longitude: 77.5946,
+                            radius: _extractDistanceValue(_selectedDistance),
+                          );
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ResultsScreen(
+                                food: _selectedFood!,
+                                distance: _selectedDistance,
+                                backendResults: results, // 👈 new param
+                              ),
                             ),
-                          ),
-                        );
+                          );
+
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Error: $e"),
+                            ),
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.orange,
