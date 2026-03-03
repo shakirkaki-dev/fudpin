@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'screens/home_screen.dart';
+import 'screens/auth_gate.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -38,15 +38,8 @@ class _SplashScreenState extends State<SplashScreen>
     Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        PageRouteBuilder(
-          transitionDuration: const Duration(milliseconds: 600),
-          pageBuilder: (_, __, ___) => const HomeScreen(),
-          transitionsBuilder: (_, animation, __, child) {
-            return FadeTransition(
-              opacity: animation,
-              child: child,
-            );
-          },
+        MaterialPageRoute(
+          builder: (_) => const AuthGate(),
         ),
       );
     });
@@ -66,8 +59,8 @@ class _SplashScreenState extends State<SplashScreen>
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFFFF8C00),   // Deep orange
-              Color(0xFFFFB347),   // Soft orange
+              Color(0xFFFF8C00),
+              Color(0xFFFFB347),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
