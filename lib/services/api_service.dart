@@ -1,9 +1,23 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'auth_service.dart';
 
 class ApiService {
-  // Android Emulator base URL
+
   static const String baseUrl = "http://10.0.2.2:8000";
+
+  // -------------------------
+  // AUTH HEADER
+  // -------------------------
+  static Future<Map<String, String>> _getAuthHeaders() async {
+
+    final token = await AuthService.getAccessToken();
+
+    return {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token"
+    };
+  }
 
   // -------------------------
   // SEARCH FOOD
@@ -14,38 +28,40 @@ class ApiService {
     required double longitude,
     required double radius,
   }) async {
+
     final uri = Uri.parse(
       "$baseUrl/search?food=$query&lat=$latitude&lng=$longitude&radius=$radius",
     );
 
     final response = await http.get(uri);
 
+    print("SEARCH STATUS: ${response.statusCode}");
+    print("SEARCH BODY: ${response.body}");
+
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
-    } else {
-      print("SEARCH STATUS CODE: ${response.statusCode}");
-      print("SEARCH BODY: ${response.body}");
-      throw Exception("Failed to fetch search results");
     }
+
+    throw Exception("Failed to search food");
   }
 
   // -------------------------
   // GET RESTAURANT MENU
   // -------------------------
   static Future<dynamic> getRestaurantMenu(int restaurantId) async {
-    final uri = Uri.parse(
-      "$baseUrl/restaurants/$restaurantId/menu",
-    );
+
+    final uri = Uri.parse("$baseUrl/restaurants/$restaurantId/menu");
 
     final response = await http.get(uri);
 
+    print("MENU STATUS: ${response.statusCode}");
+    print("MENU BODY: ${response.body}");
+
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
-    } else {
-      print("MENU STATUS CODE: ${response.statusCode}");
-      print("MENU BODY: ${response.body}");
-      throw Exception("Failed to fetch restaurant menu");
     }
+
+    throw Exception("Failed to fetch restaurant menu");
   }
 
   // -------------------------
@@ -57,29 +73,25 @@ class ApiService {
     required String phone,
     required String password,
   }) async {
+
     final uri = Uri.parse("$baseUrl/auth/register");
 
     final response = await http.post(
       uri,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: {"Content-Type": "application/json"},
       body: jsonEncode({
         "name": name,
         "email": email,
         "phone": phone,
-        "password": password,
+        "password": password
       }),
     );
 
-    print("REGISTER STATUS: ${response.statusCode}");
-    print("REGISTER BODY: ${response.body}");
-
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
-    } else {
-      throw Exception("Registration failed");
     }
+
+    throw Exception("Registration failed");
   }
 
   // -------------------------
@@ -89,26 +101,136 @@ class ApiService {
     required String email,
     required String password,
   }) async {
+
     final uri = Uri.parse("$baseUrl/auth/login");
 
     final response = await http.post(
       uri,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: {"Content-Type": "application/json"},
       body: jsonEncode({
         "email": email,
-        "password": password,
+        "password": password
       }),
     );
 
-    print("LOGIN STATUS: ${response.statusCode}");
-    print("LOGIN BODY: ${response.body}");
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+
+    throw Exception("Login failed");
+  }
+
+  // -------------------------
+  // CREATE RESTAURANT
+  // -------------------------
+  static Future<dynamic> createRestaurant({
+    required String name,
+    String? description,
+    required String address,
+    String? landmark,
+    String? phone,
+    required double latitude,
+    required double longitude,
+  }) async {
+
+    final uri = Uri.parse("$baseUrl/restaurants/");
+
+    final headers = await _getAuthHeaders();
+
+    final response = await http.post(
+      uri,
+      headers: headers,
+      body: jsonEncode({
+        "name": name,
+        "description": description,
+        "address": address,
+        "landmark": landmark,
+        "phone": phone,
+        "latitude": latitude,
+        "longitude": longitude
+      }),
+    );
+
+    print("CREATE RESTAURANT STATUS: ${response.statusCode}");
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return jsonDecode(response.body);
+    }
+
+    throw Exception("Failed to create restaurant");
+  }
+
+  // -------------------------
+  // GET MY RESTAURANTS
+  // -------------------------
+  static Future<dynamic> getMyRestaurants() async {
+
+    final uri = Uri.parse("$baseUrl/restaurants/me");
+
+    final headers = await _getAuthHeaders();
+
+    final response = await http.get(uri, headers: headers);
+
+    print("MY RESTAURANTS STATUS: ${response.statusCode}");
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
-    } else {
-      throw Exception("Login failed");
+    }
+
+    throw Exception("Failed to fetch restaurants");
+  }
+
+  // -------------------------
+  // UPDATE RESTAURANT
+  // -------------------------
+  static Future<dynamic> updateRestaurant({
+    required int id,
+    required String name,
+    String? description,
+    required String address,
+    String? landmark,
+    String? phone,
+  }) async {
+
+    final uri = Uri.parse("$baseUrl/restaurants/$id");
+
+    final headers = await _getAuthHeaders();
+
+    final response = await http.put(
+      uri,
+      headers: headers,
+      body: jsonEncode({
+        "name": name,
+        "description": description,
+        "address": address,
+        "landmark": landmark,
+        "phone": phone
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+
+    throw Exception("Failed to update restaurant");
+  }
+
+  // -------------------------
+  // DELETE RESTAURANT
+  // -------------------------
+  static Future<void> deleteRestaurant(int id) async {
+
+    final uri = Uri.parse("$baseUrl/restaurants/$id");
+
+    final headers = await _getAuthHeaders();
+
+    final response = await http.delete(uri, headers: headers);
+
+    print("DELETE STATUS: ${response.statusCode}");
+
+    if (response.statusCode != 200) {
+      throw Exception("Failed to delete restaurant");
     }
   }
+
 }
