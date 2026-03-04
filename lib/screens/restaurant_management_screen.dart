@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import 'edit_restaurant_screen.dart';
+import 'menu_management_screen.dart';
 
 class RestaurantManagementScreen extends StatefulWidget {
   final Map restaurant;
 
   const RestaurantManagementScreen({
-    super.key,
+    Key? key,
     required this.restaurant,
-  });
+  }) : super(key: key);
 
   @override
   State<RestaurantManagementScreen> createState() =>
@@ -18,7 +19,14 @@ class RestaurantManagementScreen extends StatefulWidget {
 class _RestaurantManagementScreenState
     extends State<RestaurantManagementScreen> {
 
+  late Map restaurantData;
   bool isDeleting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    restaurantData = Map.from(widget.restaurant);
+  }
 
   Future<void> deleteRestaurant() async {
 
@@ -28,7 +36,7 @@ class _RestaurantManagementScreenState
 
     try {
 
-      final id = widget.restaurant["id"];
+      final id = restaurantData["id"];
 
       await ApiService.deleteRestaurant(id);
 
@@ -52,28 +60,28 @@ class _RestaurantManagementScreenState
 
   Future<void> openEditRestaurant() async {
 
-    await Navigator.push(
+    final updatedRestaurant = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => EditRestaurantScreen(
-          restaurant: widget.restaurant,
+          restaurant: restaurantData,
         ),
       ),
     );
 
-    if (!mounted) return;
-
-    Navigator.pop(context);
+    if (updatedRestaurant != null) {
+      setState(() {
+        restaurantData = updatedRestaurant;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
 
-    final restaurant = widget.restaurant;
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(restaurant["name"]),
+        title: Text(restaurantData["name"]),
         backgroundColor: Colors.orange,
       ),
 
@@ -85,7 +93,7 @@ class _RestaurantManagementScreenState
           children: [
 
             Text(
-              restaurant["name"],
+              restaurantData["name"],
               style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -94,11 +102,11 @@ class _RestaurantManagementScreenState
 
             const SizedBox(height: 10),
 
-            Text(restaurant["address"] ?? ""),
+            Text(restaurantData["address"] ?? ""),
 
             const SizedBox(height: 10),
 
-            Text("Phone: ${restaurant["phone"] ?? ""}"),
+            Text("Phone: ${restaurantData["phone"] ?? ""}"),
 
             const SizedBox(height: 30),
 
@@ -107,8 +115,14 @@ class _RestaurantManagementScreenState
               child: ElevatedButton.icon(
                 onPressed: () {
 
-                  // Next phase
-                  // Menu management
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => MenuManagementScreen(
+                        restaurantId: restaurantData["id"],
+                      ),
+                    ),
+                  );
 
                 },
                 icon: const Icon(Icons.restaurant_menu),

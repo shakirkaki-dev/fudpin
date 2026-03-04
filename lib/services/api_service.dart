@@ -35,9 +35,6 @@ class ApiService {
 
     final response = await http.get(uri);
 
-    print("SEARCH STATUS: ${response.statusCode}");
-    print("SEARCH BODY: ${response.body}");
-
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     }
@@ -54,14 +51,74 @@ class ApiService {
 
     final response = await http.get(uri);
 
-    print("MENU STATUS: ${response.statusCode}");
-    print("MENU BODY: ${response.body}");
-
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     }
 
     throw Exception("Failed to fetch restaurant menu");
+  }
+
+  // -------------------------
+  // CREATE MENU ITEM
+  // -------------------------
+  static Future<dynamic> createMenuItem(Map data) async {
+
+    final uri = Uri.parse("$baseUrl/menu-items");
+
+    final headers = await _getAuthHeaders();
+
+    final response = await http.post(
+      uri,
+      headers: headers,
+      body: jsonEncode(data),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return jsonDecode(response.body);
+    }
+
+    throw Exception("Failed to create menu item");
+  }
+
+  // -------------------------
+  // UPDATE MENU ITEM
+  // -------------------------
+  static Future updateMenuItem({
+    required int id,
+    bool? isAvailable,
+  }) async {
+
+    final uri = Uri.parse("$baseUrl/menu-items/$id");
+
+    final headers = await _getAuthHeaders();
+
+    final response = await http.put(
+      uri,
+      headers: headers,
+      body: jsonEncode({
+        "is_available": isAvailable
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception("Failed to update menu item");
+    }
+  }
+
+  // -------------------------
+  // DELETE MENU ITEM
+  // -------------------------
+  static Future deleteMenuItem(int id) async {
+
+    final uri = Uri.parse("$baseUrl/menu-items/$id");
+
+    final headers = await _getAuthHeaders();
+
+    final response = await http.delete(uri, headers: headers);
+
+    if (response.statusCode != 200) {
+      throw Exception("Failed to delete menu item");
+    }
   }
 
   // -------------------------
@@ -151,8 +208,6 @@ class ApiService {
       }),
     );
 
-    print("CREATE RESTAURANT STATUS: ${response.statusCode}");
-
     if (response.statusCode == 200 || response.statusCode == 201) {
       return jsonDecode(response.body);
     }
@@ -170,8 +225,6 @@ class ApiService {
     final headers = await _getAuthHeaders();
 
     final response = await http.get(uri, headers: headers);
-
-    print("MY RESTAURANTS STATUS: ${response.statusCode}");
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -225,8 +278,6 @@ class ApiService {
     final headers = await _getAuthHeaders();
 
     final response = await http.delete(uri, headers: headers);
-
-    print("DELETE STATUS: ${response.statusCode}");
 
     if (response.statusCode != 200) {
       throw Exception("Failed to delete restaurant");
