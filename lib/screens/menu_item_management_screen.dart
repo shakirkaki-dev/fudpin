@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import 'edit_menu_item_screen.dart';
 
 class MenuItemManagementScreen extends StatefulWidget {
 
@@ -19,11 +20,14 @@ class _MenuItemManagementScreenState
     extends State<MenuItemManagementScreen> {
 
   late bool isAvailable;
+  late Map item;
 
   @override
   void initState() {
     super.initState();
-    isAvailable = widget.menuItem["is_available"];
+
+    item = widget.menuItem;
+    isAvailable = item["is_available"];
   }
 
   Future<void> toggleAvailability() async {
@@ -31,7 +35,7 @@ class _MenuItemManagementScreenState
     try {
 
       await ApiService.updateMenuItem(
-        id: widget.menuItem["id"],
+        id: item["id"],
         isAvailable: !isAvailable,
       );
 
@@ -55,7 +59,7 @@ class _MenuItemManagementScreenState
 
     try {
 
-      await ApiService.deleteMenuItem(widget.menuItem["id"]);
+      await ApiService.deleteMenuItem(item["id"]);
 
       if (!mounted) return;
 
@@ -73,10 +77,28 @@ class _MenuItemManagementScreenState
 
   }
 
+  Future<void> openEditScreen() async {
+
+    final updatedItem = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => EditMenuItemScreen(menuItem: item),
+      ),
+    );
+
+    if (updatedItem != null) {
+
+      setState(() {
+        item = updatedItem;
+        isAvailable = updatedItem["is_available"];
+      });
+
+    }
+
+  }
+
   @override
   Widget build(BuildContext context) {
-
-    final item = widget.menuItem;
 
     return Scaffold(
       appBar: AppBar(
@@ -115,9 +137,7 @@ class _MenuItemManagementScreenState
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: () {
-                  // Edit dish screen (later)
-                },
+                onPressed: openEditScreen,
                 icon: const Icon(Icons.edit),
                 label: const Text("Edit Dish"),
               ),

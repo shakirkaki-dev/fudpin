@@ -85,24 +85,36 @@ class ApiService {
   // -------------------------
   static Future updateMenuItem({
     required int id,
+    String? name,
+    String? description,
     bool? isAvailable,
+    List? variants,
+    List? specifications,
   }) async {
 
     final uri = Uri.parse("$baseUrl/menu-items/$id");
 
     final headers = await _getAuthHeaders();
 
+    final Map<String, dynamic> body = {};
+
+    if (name != null) body["name"] = name;
+    if (description != null) body["description"] = description;
+    if (isAvailable != null) body["is_available"] = isAvailable;
+    if (variants != null) body["variants"] = variants;
+    if (specifications != null) body["specifications"] = specifications;
+
     final response = await http.put(
       uri,
       headers: headers,
-      body: jsonEncode({
-        "is_available": isAvailable
-      }),
+      body: jsonEncode(body),
     );
 
     if (response.statusCode != 200) {
       throw Exception("Failed to update menu item");
     }
+
+    return jsonDecode(response.body);
   }
 
   // -------------------------

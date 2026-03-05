@@ -96,11 +96,12 @@ class _RestaurantDetailScreenState
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1), // softer background
+      backgroundColor: const Color(0xFFFFF8F1),
+
       body: Column(
         children: [
 
-          /// 🟠 HEADER
+          /// HEADER
           Container(
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(20, 55, 20, 30),
@@ -147,7 +148,7 @@ class _RestaurantDetailScreenState
             ),
           ),
 
-          /// 🟢 BODY
+          /// BODY
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
@@ -156,7 +157,7 @@ class _RestaurantDetailScreenState
                     CrossAxisAlignment.start,
                 children: [
 
-                  /// 🔥 SEARCHED FOOD CARD
+                  /// SELECTED FOOD
                   if (searchedFood != null)
                     Container(
                       padding: const EdgeInsets.all(18),
@@ -258,8 +259,9 @@ class _RestaurantDetailScreenState
 
                   const SizedBox(height: 28),
 
-                  /// 🍽 OTHER MENU
+                  /// OTHER MENU
                   if (otherMenu.isNotEmpty) ...[
+
                     const Text(
                       "Other Menu",
                       style: TextStyle(
@@ -281,13 +283,35 @@ class _RestaurantDetailScreenState
                                   16),
                         ),
                         child: ListTile(
-                          title:
-                              Text(item["name"]),
+                          title: Text(item["name"]),
                           subtitle: Text(
                               "Starting ₹${item["variants"].first["price"]}"),
+                          trailing: const Icon(
+                            Icons.arrow_forward_ios,
+                            size: 16,
+                          ),
+
+                          /// CLICKABLE FIX
+                          onTap: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    RestaurantDetailScreen(
+                                  restaurantId:
+                                      widget.restaurantId,
+                                  foodItemId:
+                                      item["id"],
+                                  distanceKm:
+                                      widget.distanceKm,
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       );
                     }),
+
                   ],
                 ],
               ),
@@ -296,12 +320,13 @@ class _RestaurantDetailScreenState
         ],
       ),
 
-      /// 🔥 STICKY ACTION BAR
+      /// ACTION BAR
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
         color: Colors.white,
         child: Row(
           children: [
+
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: _callRestaurant,
@@ -320,7 +345,9 @@ class _RestaurantDetailScreenState
                 ),
               ),
             ),
+
             const SizedBox(width: 14),
+
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: _openMaps,
