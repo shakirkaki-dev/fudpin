@@ -28,118 +28,200 @@ class _HomeScreenState extends State<HomeScreen> {
     return double.parse(distanceText.split(" ")[0]);
   }
 
+  void _startSearch() async {
+
+    if (_selectedFood == null || _selectedFood!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter a food name")),
+      );
+      return;
+    }
+
+    try {
+
+      final results = await ApiService.searchFood(
+        query: _selectedFood!,
+        latitude: 12.9716,
+        longitude: 77.5946,
+        radius: _extractDistanceValue(_selectedDistance),
+      );
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResultsScreen(
+            food: _selectedFood!,
+            distance: _selectedDistance,
+            backendResults: results,
+          ),
+        ),
+      );
+
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    }
+  }
+
+  Widget sectionTitle(String text) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          text,
+          style: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Container(
+          width: 35,
+          height: 3,
+          decoration: BoxDecoration(
+            color: const Color(0xFFFF6A00),
+            borderRadius: BorderRadius.circular(3),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F6),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
 
-            /// 🔥 HERO SECTION
-            Container(
-              height: 270,
-              width: double.infinity,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Image.asset(
-                    "assets/images/food_bg.jpg",
-                    fit: BoxFit.cover,
-                  ),
-                  BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
-                    child: Container(
-                      color: Colors.black.withOpacity(0.45),
+    return Scaffold(
+      body: Container(
+
+        /// BACKGROUND TEXTURE
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/background_texture.png"),
+            fit: BoxFit.cover,
+          ),
+        ),
+
+        child: SafeArea(
+          child: Column(
+            children: [
+
+              /// FOOD IMAGE + LOGO
+              Container(
+                height: 220,
+                width: double.infinity,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+
+                    Image.asset(
+                      "assets/images/food_bg.jpg",
+                      fit: BoxFit.cover,
                     ),
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
+
+                    BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                      child: Container(
+                        color: Colors.black.withOpacity(0.35),
+                      ),
+                    ),
+
+                    Center(
+                      child: Image.asset(
                         "assets/images/dishway_logo.png",
-                        height: 120,
+                        height: 160,
                       ),
-                      const SizedBox(height: 14),
-                      const Text(
-                        "Find food before you stop",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                    )
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              /// SEARCH CARD
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  padding: const EdgeInsets.all(22),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(18),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        blurRadius: 10,
+                        offset: const Offset(0,4),
+                      )
                     ],
                   ),
-                ],
-              ),
-            ),
 
-            /// 🔥 BODY
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
 
-                  const Text(
-                    "Search food",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 8),
+                      /// SEARCH FOOD TITLE
+                      sectionTitle("What You Want To Eat Now"),
 
-                  /// 🔥 TEXT FIELD (Now normal input, backend will validate)
-                  Container(
-                    height: 58,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: Colors.grey.shade400,
-                        width: 1.2,
+                      const SizedBox(height: 10),
+
+                      /// FOOD INPUT
+                      TextField(
+                        controller: _foodController,
+                        decoration: InputDecoration(
+                          hintText: "Eg: Biryani, Pizza...",
+                          prefixIcon: const Icon(Icons.search),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 10),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade300,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFFF6A00),
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                        onChanged: (value) {
+                          _selectedFood = value;
+                        },
                       ),
-                    ),
-                    child: TextField(
-                      controller: _foodController,
-                      decoration: const InputDecoration(
-                        hintText: "Eg: Biryani, Pizza...",
-                        prefixIcon: Icon(Icons.search),
-                        border: InputBorder.none,
-                        contentPadding:
-                            EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      onChanged: (value) {
-                        _selectedFood = value;
-                      },
-                    ),
-                  ),
 
-                  const SizedBox(height: 24),
+                      const SizedBox(height: 20),
 
-                  const Text(
-                    "Search within distance",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 8),
+                      /// DISTANCE TITLE
+                      sectionTitle("Within Distance Of"),
 
-                  Container(
-                    height: 58,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: Colors.grey.shade400,
-                        width: 1.2,
-                      ),
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
+                      const SizedBox(height: 10),
+
+                      /// DISTANCE DROPDOWN
+                      DropdownButtonFormField<String>(
                         value: _selectedDistance,
-                        isExpanded: true,
-                        icon: const Icon(Icons.keyboard_arrow_down),
-                        items: _distances.map((String distance) {
-                          return DropdownMenuItem<String>(
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 10),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade300,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFFF6A00),
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                        items: _distances.map((distance) {
+                          return DropdownMenuItem(
                             value: distance,
                             child: Text(distance),
                           );
@@ -150,85 +232,51 @@ class _HomeScreenState extends State<HomeScreen> {
                           });
                         },
                       ),
-                    ),
-                  ),
 
-                  const SizedBox(height: 32),
+                      const SizedBox(height: 22),
 
-                  /// 🔥 CTA BUTTON (Backend Call Here)
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton(
-                      onPressed: () async {
-
-                        if (_selectedFood == null || _selectedFood!.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Please enter a food name"),
+                      /// SEARCH BUTTON
+                      SizedBox(
+                        width: double.infinity,
+                        height: 55,
+                        child: ElevatedButton(
+                          onPressed: _startSearch,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFFF6A00),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                          );
-                          return;
-                        }
-
-                        try {
-                          final results = await ApiService.searchFood(
-                            query: _selectedFood!,
-                            latitude: 12.9716,  // TEMP Bangalore
-                            longitude: 77.5946,
-                            radius: _extractDistanceValue(_selectedDistance),
-                          );
-
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ResultsScreen(
-                                food: _selectedFood!,
-                                distance: _selectedDistance,
-                                backendResults: results, // 👈 new param
-                              ),
+                          ),
+                          child: const Text(
+                            "SEARCH",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
                             ),
-                          );
-
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("Error: $e"),
-                            ),
-                          );
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                          ),
                         ),
                       ),
-                      child: const Text(
-                        "Find Nearby Food",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
+                    ],
                   ),
-
-                  const SizedBox(height: 30),
-
-                  const Center(
-                    child: Text(
-                      "Discover. Decide. Dine.",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        color: Colors.orange,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ],
+
+              const SizedBox(height: 40),
+
+              /// FOOTER
+              const Text(
+                "DISCOVER. DECIDE. DINE.",
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 20,
+                  color: Color(0xFFFF6A00),
+                ),
+              ),
+
+              const SizedBox(height: 0),
+            ],
+          ),
         ),
       ),
     );

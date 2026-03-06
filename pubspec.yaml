@@ -28,3 +28,6 @@ flutter:
   assets:
     - assets/images/dishway_logo.png
     - assets/images/food_bg.jpg
+    - assets/images/onboarding_food.png
+    - assets/images/background_texture.png
+    

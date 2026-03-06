@@ -9,102 +9,207 @@ class OnboardingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 30),
+
+        /// BACKGROUND IMAGE
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFFFF8C00),
-              Color(0xFFFFB347),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+          image: DecorationImage(
+            image: AssetImage("assets/images/background_texture.png"),
+            fit: BoxFit.cover,
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
 
-            const Spacer(),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 28),
+            child: Column(
+              children: [
 
-            Image.asset(
-              "assets/images/dishway_logo.png",
-              height: 120,
-            ),
+                const SizedBox(height: 30),
 
-            const SizedBox(height: 20),
-
-            const Text(
-              "Discover dishes around you.",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.center,
-            ),
-
-            const SizedBox(height: 8),
-
-            const Text(
-              "Search. Compare. Call. Navigate.",
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 14,
-              ),
-              textAlign: TextAlign.center,
-            ),
-
-            const Spacer(),
-
-            // Continue as Guest (Temporary push for back navigation)
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.orange,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                /// FOOD ILLUSTRATION
+                Image.asset(
+                  "assets/images/onboarding_food.png",
+                  height: 220,
                 ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const HomeScreen(),
-                    ),
-                  );
-                },
-                child: const Text("Continue as Guest"),
-              ),
-            ),
 
-            const SizedBox(height: 12),
+                const SizedBox(height: 5),
 
-            // Login as Owner
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Colors.white),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                /// LOGO
+                Image.asset(
+                  "assets/images/dishway_logo.png",
+                  height: 200,
                 ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const LoginScreen(),
-                    ),
-                  );
-                },
-                child: const Text("Login as Restaurant Owner"),
-              ),
-            ),
 
-            const SizedBox(height: 50),
-          ],
+                const SizedBox(height: 0),
+
+                /// TAGLINE
+                const Text(
+                  "Find your favourite food before stopping",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF5A3E36),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+
+                const SizedBox(height: 4),
+
+                /// SUB TEXT
+                const Text(
+                  "Get the details of all restaurants nearby which serve your desired food",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF7A5E55),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+
+                const SizedBox(height: 35),
+
+                /// FEATURES
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: const [
+
+                    FeatureItem(
+                      icon: Icons.search,
+                      label: "Search Dish",
+                    ),
+
+                    FeatureItem(
+                      icon: Icons.location_on,
+                      label: "Nearby",
+                    ),
+
+                    FeatureItem(
+                      icon: Icons.navigation,
+                      label: "Navigate",
+                    ),
+                  ],
+                ),
+
+                const Spacer(),
+
+                /// CONTINUE AS GUEST
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: const Color(0xFFFF6A00),
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const HomeScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      "Continue as Guest",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 14),
+
+                /// LOGIN OWNER
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFF6A00),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const LoginScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      "Login as Restaurant Owner",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 35),
+              ],
+            ),
+          ),
         ),
       ),
+    );
+  }
+}
+
+class FeatureItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const FeatureItem({
+    super.key,
+    required this.icon,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              )
+            ],
+          ),
+          child: Icon(
+            icon,
+            size: 26,
+            color: const Color(0xFFFF6A00),
+          ),
+        ),
+
+        const SizedBox(height: 8),
+
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 13,
+            color: Color(0xFF5A3E36),
+          ),
+        ),
+      ],
     );
   }
 }
