@@ -8,6 +8,12 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
+    <!-- Recommended for Android 10+ -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+
+    <!-- Declare location hardware -->
+    <uses-feature android:name="android.hardware.location.gps"/>
+
     <application
         android:label="dishway"
         android:name="${applicationName}"

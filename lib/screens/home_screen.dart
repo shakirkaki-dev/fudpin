@@ -269,7 +269,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 "DISCOVER. DECIDE. DINE.",
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
-                  fontSize: 20,
+                  fontSize: 16,
                   color: Color(0xFFFF6A00),
                 ),
               ),

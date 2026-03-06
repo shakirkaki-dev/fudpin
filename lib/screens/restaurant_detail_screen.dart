@@ -5,12 +5,14 @@ import '../services/api_service.dart';
 class RestaurantDetailScreen extends StatefulWidget {
   final int restaurantId;
   final int foodItemId;
+  final int originalSearchFoodId;
   final double distanceKm;
 
   const RestaurantDetailScreen({
     super.key,
     required this.restaurantId,
     required this.foodItemId,
+    required this.originalSearchFoodId,
     required this.distanceKm,
   });
 
@@ -21,10 +23,11 @@ class RestaurantDetailScreen extends StatefulWidget {
 
 class _RestaurantDetailScreenState
     extends State<RestaurantDetailScreen> {
+
   bool isLoading = true;
   dynamic restaurantData;
-  dynamic searchedFood;
-  List otherMenu = [];
+  dynamic currentFood;
+  List menuItems = [];
 
   @override
   void initState() {
@@ -33,33 +36,36 @@ class _RestaurantDetailScreenState
   }
 
   Future<void> _fetchRestaurantMenu() async {
+
     try {
+
       final data =
           await ApiService.getRestaurantMenu(widget.restaurantId);
 
-      final List menuItems = data["menu"] ?? [];
+      final List menu = data["menu"] ?? [];
 
-      searchedFood = menuItems.firstWhere(
+      currentFood = menu.firstWhere(
         (item) => item["id"] == widget.foodItemId,
         orElse: () => null,
       );
 
-      otherMenu = menuItems
-          .where((item) => item["id"] != widget.foodItemId)
-          .toList();
-
       setState(() {
         restaurantData = data;
+        menuItems = menu;
         isLoading = false;
       });
+
     } catch (e) {
+
       setState(() {
         isLoading = false;
       });
+
     }
   }
 
   Future<void> _callRestaurant() async {
+
     final phone = restaurantData["phone"];
     final Uri callUri = Uri.parse("tel:$phone");
 
@@ -69,6 +75,7 @@ class _RestaurantDetailScreenState
   }
 
   Future<void> _openMaps() async {
+
     final lat = restaurantData["latitude"];
     final lng = restaurantData["longitude"];
 
@@ -76,13 +83,16 @@ class _RestaurantDetailScreenState
         "https://www.google.com/maps/search/?api=1&query=$lat,$lng");
 
     if (await canLaunchUrl(mapsUri)) {
-      await launchUrl(mapsUri,
-          mode: LaunchMode.externalApplication);
+      await launchUrl(
+        mapsUri,
+        mode: LaunchMode.externalApplication,
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+
     if (isLoading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -96,228 +106,189 @@ class _RestaurantDetailScreenState
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F1),
 
-      body: Column(
-        children: [
+      body: Container(
 
-          /// HEADER
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(20, 55, 20, 30),
-            decoration: const BoxDecoration(
-              color: Color(0xFFF59E0B),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(28),
-                bottomRight: Radius.circular(28),
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: const Icon(
-                    Icons.arrow_back_ios_new,
-                    color: Colors.white,
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                Text(
-                  restaurantData["restaurant_name"],
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                const SizedBox(height: 6),
-
-                Text(
-                  "${widget.distanceKm} km away",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(
+                "assets/images/background_texture.png"),
+            fit: BoxFit.cover,
           ),
+        ),
 
-          /// BODY
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
-                children: [
+        child: SafeArea(
+          child: Column(
+            children: [
 
-                  /// SELECTED FOOD
-                  if (searchedFood != null)
-                    Container(
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius:
-                            BorderRadius.circular(18),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black
-                                .withOpacity(0.05),
-                            blurRadius: 10,
-                          )
-                        ],
+              /// BACK BUTTON
+              Padding(
+                padding: const EdgeInsets.only(
+                    left: 20, top: 10),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: const Icon(
+                      Icons.arrow_back_ios_new,
+                      size: 20,
+                      color: Color(0xFF5A3E36),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              /// RESTAURANT INFO CARD
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius:
+                        BorderRadius.circular(18),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black
+                            .withOpacity(0.05),
+                        blurRadius: 10,
+                      )
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
+                    children: [
+
+                      Text(
+                        restaurantData["restaurant_name"],
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight:
+                              FontWeight.bold,
+                          color: Color(0xFF5A3E36),
+                        ),
                       ),
-                      child: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment.start,
-                        children: [
 
-                          Text(
-                            searchedFood["name"],
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight:
-                                  FontWeight.bold,
+                      const SizedBox(height: 4),
+
+                      Text(
+                        "${widget.distanceKm} km away",
+                        style: const TextStyle(
+                          color: Color(0xFF7A5E55),
+                        ),
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.location_on,
+                            size: 16,
+                            color: Color(0xFFFF6A00),
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              restaurantData["address"] ?? "",
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFF7A5E55),
+                              ),
                             ),
                           ),
-
-                          const SizedBox(height: 16),
-
-                          ...searchedFood["variants"]
-                              .map<Widget>((variant) =>
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets
-                                            .only(
-                                                bottom:
-                                                    8),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment
-                                              .spaceBetween,
-                                      children: [
-                                        Text(variant[
-                                            "name"]),
-                                        Text(
-                                          "₹${variant["price"]}",
-                                          style:
-                                              const TextStyle(
-                                            fontWeight:
-                                                FontWeight
-                                                    .bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )),
-
-                          const SizedBox(height: 16),
-
-                          ...searchedFood[
-                                  "specifications"]
-                              .map<Widget>((spec) =>
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets
-                                            .only(
-                                                bottom:
-                                                    6),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment
-                                              .spaceBetween,
-                                      children: [
-                                        Text(
-                                          spec["label"],
-                                          style:
-                                              const TextStyle(
-                                            color: Colors
-                                                .grey,
-                                          ),
-                                        ),
-                                        Text(
-                                          spec["value"],
-                                          style:
-                                              const TextStyle(
-                                            fontWeight:
-                                                FontWeight
-                                                    .w600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )),
                         ],
                       ),
-                    ),
 
-                  const SizedBox(height: 28),
-
-                  /// OTHER MENU
-                  if (otherMenu.isNotEmpty) ...[
-
-                    const Text(
-                      "Other Menu",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    ...otherMenu.map<Widget>((item) {
-                      return Container(
-                        margin: const EdgeInsets.only(
-                            bottom: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius:
-                              BorderRadius.circular(
-                                  16),
+                      if (restaurantData["landmark"] != null)
+                        Padding(
+                          padding:
+                              const EdgeInsets.only(top: 4),
+                          child: Text(
+                            "Near ${restaurantData["landmark"]}",
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF7A5E55),
+                            ),
+                          ),
                         ),
-                        child: ListTile(
-                          title: Text(item["name"]),
-                          subtitle: Text(
-                              "Starting ₹${item["variants"].first["price"]}"),
-                          trailing: const Icon(
-                            Icons.arrow_forward_ios,
+
+                      const SizedBox(height: 6),
+
+                      Row(
+                        children: [
+
+                          const Icon(
+                            Icons.phone,
                             size: 16,
+                            color: Color(0xFFFF6A00),
                           ),
 
-                          /// CLICKABLE FIX
-                          onTap: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    RestaurantDetailScreen(
-                                  restaurantId:
-                                      widget.restaurantId,
-                                  foodItemId:
-                                      item["id"],
-                                  distanceKm:
-                                      widget.distanceKm,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      );
-                    }),
+                          const SizedBox(width: 6),
 
-                  ],
-                ],
+                          Text(
+                            restaurantData["phone"] ?? "",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF5A3E36),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
+
+              const SizedBox(height: 20),
+
+              Expanded(
+                child: SingleChildScrollView(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
+                    children: [
+
+                      /// CURRENT DISH
+                      if (currentFood != null)
+                        _foodDetailsCard(currentFood),
+
+                      const SizedBox(height: 25),
+
+                      const Text(
+                        "Menu",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF5A3E36),
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      ...menuItems.map((item) {
+
+                        if (item["id"] ==
+                            widget.foodItemId) {
+                          return const SizedBox();
+                        }
+
+                        return _menuItemCard(item);
+
+                      }).toList(),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
 
       /// ACTION BAR
@@ -334,7 +305,8 @@ class _RestaurantDetailScreenState
                 label: const Text("Call"),
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
-                      const Color(0xFFF59E0B),
+                      const Color(0xFFFF6A00),
+                  foregroundColor: Colors.white,
                   padding:
                       const EdgeInsets.symmetric(
                           vertical: 18),
@@ -351,12 +323,12 @@ class _RestaurantDetailScreenState
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: _openMaps,
-                icon:
-                    const Icon(Icons.navigation),
+                icon: const Icon(Icons.navigation),
                 label: const Text("Navigate"),
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
-                      const Color(0xFFFB923C),
+                      const Color(0xFFFF6A00),
+                  foregroundColor: Colors.white,
                   padding:
                       const EdgeInsets.symmetric(
                           vertical: 18),
@@ -369,6 +341,220 @@ class _RestaurantDetailScreenState
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// TOP DISH DETAILS
+  Widget _foodDetailsCard(dynamic item) {
+
+    final bool isSearchedDish =
+        item["id"] == widget.originalSearchFoodId;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
+        children: [
+
+          if (isSearchedDish)
+            Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFF6A00)
+                    .withOpacity(0.15),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: const Text(
+                "⭐ You searched for this",
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFFFF6A00),
+                ),
+              ),
+            ),
+
+          Text(
+            item["name"],
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF5A3E36),
+            ),
+          ),
+
+          if (item["description"] != null)
+            Padding(
+              padding:
+                  const EdgeInsets.only(top: 4),
+              child: Text(
+                item["description"],
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: Color(0xFF7A5E55),
+                ),
+              ),
+            ),
+
+          const SizedBox(height: 10),
+
+          /// VARIANTS
+          if (item["variants"] != null)
+            ...item["variants"].map<Widget>((variant) {
+
+              return Padding(
+                padding:
+                    const EdgeInsets.only(bottom: 6),
+                child: Row(
+                  mainAxisAlignment:
+                      MainAxisAlignment.spaceBetween,
+                  children: [
+
+                    Text(variant["name"]),
+
+                    Text(
+                      "₹${variant["price"]}",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFFFF6A00),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+
+            }).toList(),
+
+          /// SPECIFICATIONS
+          if (item["specifications"] != null)
+            ...item["specifications"].map<Widget>((spec) {
+
+              return Padding(
+                padding:
+                    const EdgeInsets.only(bottom: 4),
+                child: Row(
+                  mainAxisAlignment:
+                      MainAxisAlignment.spaceBetween,
+                  children: [
+
+                    Text(spec["label"]),
+
+                    Text(
+                      spec["value"],
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+
+            }).toList(),
+        ],
+      ),
+    );
+  }
+
+  /// MENU LIST ITEMS
+  Widget _menuItemCard(dynamic item) {
+
+    final bool isSearchedDish =
+        item["id"] == widget.originalSearchFoodId;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: ListTile(
+
+        title: Column(
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
+          children: [
+
+            if (isSearchedDish)
+              Container(
+                margin:
+                    const EdgeInsets.only(bottom: 4),
+                padding:
+                    const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 3),
+                decoration:
+                    BoxDecoration(
+                  color: const Color(
+                          0xFFFF6A00)
+                      .withOpacity(
+                          0.15),
+                  borderRadius:
+                      BorderRadius
+                          .circular(
+                              6),
+                ),
+                child: const Text(
+                  "⭐ You searched for this",
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight:
+                        FontWeight.w600,
+                    color: Color(
+                        0xFFFF6A00),
+                  ),
+                ),
+              ),
+
+            Text(
+              item["name"],
+              style:
+                  const TextStyle(
+                fontSize: 16,
+                fontWeight:
+                    FontWeight
+                        .w600,
+                color: Color(
+                    0xFF5A3E36),
+              ),
+            ),
+          ],
+        ),
+
+        trailing: const Icon(
+          Icons.arrow_forward_ios,
+          size: 16,
+        ),
+
+        onTap: () {
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) =>
+                  RestaurantDetailScreen(
+                restaurantId:
+                    widget
+                        .restaurantId,
+                foodItemId:
+                    item["id"],
+                originalSearchFoodId:
+                    widget
+                        .originalSearchFoodId,
+                distanceKm:
+                    widget
+                        .distanceKm,
+              ),
+            ),
+          );
+
+        },
       ),
     );
   }

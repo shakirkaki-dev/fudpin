@@ -47,6 +47,12 @@ class _AddRestaurantScreenState extends State<AddRestaurantScreen> {
       longitude = position.longitude;
       locationDetected = true;
     });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Restaurant location detected successfully"),
+      ),
+    );
   }
 
   Future<void> createRestaurant() async {
@@ -98,92 +104,206 @@ class _AddRestaurantScreenState extends State<AddRestaurantScreen> {
   Widget build(BuildContext context) {
 
     return Scaffold(
+
       appBar: AppBar(
         title: const Text("Add Restaurant"),
-        backgroundColor: Colors.orange,
+        backgroundColor: const Color(0xFFFF6A00),
       ),
 
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+      body: Container(
 
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/background_texture.png"),
+            fit: BoxFit.cover,
+          ),
+        ),
 
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: "Restaurant Name",
-                ),
-              ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
 
-              const SizedBox(height: 12),
+              child: Column(
+                children: [
 
-              TextField(
-                controller: descriptionController,
-                decoration: const InputDecoration(
-                  labelText: "Description",
-                ),
-              ),
+                  const SizedBox(height: 10),
 
-              const SizedBox(height: 12),
-
-              TextField(
-                controller: addressController,
-                decoration: const InputDecoration(
-                  labelText: "Address",
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              TextField(
-                controller: landmarkController,
-                decoration: const InputDecoration(
-                  labelText: "Landmark",
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              TextField(
-                controller: phoneController,
-                decoration: const InputDecoration(
-                  labelText: "Phone",
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              ElevatedButton.icon(
-                onPressed: detectLocation,
-                icon: const Icon(Icons.my_location),
-                label: Text(
-                  locationDetected
-                      ? "Location Detected"
-                      : "Detect Restaurant Location",
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                ),
-              ),
-
-              const SizedBox(height: 30),
-
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: isLoading ? null : createRestaurant,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
+                  /// HEADER
+                  const Text(
+                    "Add Your Restaurant",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF5A3E36),
+                    ),
                   ),
-                  child: isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text("Create Restaurant"),
-                ),
-              ),
 
-            ],
+                  const SizedBox(height: 8),
+
+                  const Text(
+                    "Fill the details below so nearby customers can discover your restaurant and dishes.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF7A5E55),
+                    ),
+                  ),
+
+                  const SizedBox(height: 25),
+
+                  /// FORM CARD
+                  Container(
+                    padding: const EdgeInsets.all(20),
+
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.08),
+                          blurRadius: 12,
+                          offset: const Offset(0,4),
+                        )
+                      ],
+                    ),
+
+                    child: Column(
+                      children: [
+
+                        TextField(
+                          controller: nameController,
+                          decoration: InputDecoration(
+                            labelText: "Restaurant Name",
+                            prefixIcon: const Icon(Icons.restaurant),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 14),
+
+                        TextField(
+                          controller: descriptionController,
+                          maxLines: 2,
+                          decoration: InputDecoration(
+                            labelText: "Description",
+                            prefixIcon: const Icon(Icons.description),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 14),
+
+                        TextField(
+                          controller: addressController,
+                          maxLines: 2,
+                          decoration: InputDecoration(
+                            labelText: "Address",
+                            prefixIcon: const Icon(Icons.location_on),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 14),
+
+                        TextField(
+                          controller: landmarkController,
+                          decoration: InputDecoration(
+                            labelText: "Landmark",
+                            prefixIcon: const Icon(Icons.place),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 14),
+
+                        TextField(
+                          controller: phoneController,
+                          keyboardType: TextInputType.phone,
+                          decoration: InputDecoration(
+                            labelText: "Phone",
+                            prefixIcon: const Icon(Icons.phone),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        /// LOCATION BUTTON
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: locationDetected ? null : detectLocation,
+                            icon: const Icon(Icons.my_location),
+
+                            label: Text(
+                              locationDetected
+                                  ? "Location Detected ✓"
+                                  : "Detect Restaurant Location",
+                            ),
+
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFFF6A00),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  /// CREATE RESTAURANT BUTTON
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+
+                      onPressed: isLoading ? null : createRestaurant,
+
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFF6A00),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+
+                      child: isLoading
+                          ? const CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                          : const Text(
+                              "Create Restaurant",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 30),
+
+                ],
+              ),
+            ),
           ),
         ),
       ),
