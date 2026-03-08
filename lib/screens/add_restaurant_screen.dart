@@ -100,6 +100,31 @@ class _AddRestaurantScreenState extends State<AddRestaurantScreen> {
     });
   }
 
+  Widget inputField(
+      TextEditingController controller,
+      String label,
+      IconData icon,
+      {int lines = 1,
+      TextInputType? type}) {
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: TextField(
+        controller: controller,
+        maxLines: lines,
+        keyboardType: type,
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: Icon(icon),
+          contentPadding: const EdgeInsets.symmetric(vertical: 12),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -120,50 +145,50 @@ class _AddRestaurantScreenState extends State<AddRestaurantScreen> {
         ),
 
         child: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
 
-              child: Column(
-                children: [
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18),
 
-                  const SizedBox(height: 10),
+            child: Column(
 
-                  /// HEADER
-                  const Text(
-                    "Add Your Restaurant",
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF5A3E36),
-                    ),
+              children: [
+
+                const SizedBox(height: 10),
+
+                const Text(
+                  "Add Your Restaurant",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF5A3E36),
                   ),
+                ),
 
-                  const SizedBox(height: 8),
+                const SizedBox(height: 4),
 
-                  const Text(
-                    "Fill the details below so nearby customers can discover your restaurant and dishes.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF7A5E55),
-                    ),
+                const Text(
+                  "Fill details so nearby customers can discover your dishes.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF7A5E55),
                   ),
+                ),
 
-                  const SizedBox(height: 25),
+                const SizedBox(height: 10),
 
-                  /// FORM CARD
-                  Container(
-                    padding: const EdgeInsets.all(20),
+                /// FORM CARD
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
 
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(18),
+                      borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.08),
-                          blurRadius: 12,
-                          offset: const Offset(0,4),
+                          blurRadius: 10,
                         )
                       ],
                     ),
@@ -171,73 +196,40 @@ class _AddRestaurantScreenState extends State<AddRestaurantScreen> {
                     child: Column(
                       children: [
 
-                        TextField(
-                          controller: nameController,
-                          decoration: InputDecoration(
-                            labelText: "Restaurant Name",
-                            prefixIcon: const Icon(Icons.restaurant),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
+                        inputField(
+                          nameController,
+                          "Restaurant Name",
+                          Icons.restaurant,
                         ),
 
-                        const SizedBox(height: 14),
-
-                        TextField(
-                          controller: descriptionController,
-                          maxLines: 2,
-                          decoration: InputDecoration(
-                            labelText: "Description",
-                            prefixIcon: const Icon(Icons.description),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
+                        inputField(
+                          descriptionController,
+                          "Description",
+                          Icons.description,
+                          lines: 2,
                         ),
 
-                        const SizedBox(height: 14),
-
-                        TextField(
-                          controller: addressController,
-                          maxLines: 2,
-                          decoration: InputDecoration(
-                            labelText: "Address",
-                            prefixIcon: const Icon(Icons.location_on),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
+                        inputField(
+                          addressController,
+                          "Address",
+                          Icons.location_on,
+                          lines: 2,
                         ),
 
-                        const SizedBox(height: 14),
-
-                        TextField(
-                          controller: landmarkController,
-                          decoration: InputDecoration(
-                            labelText: "Landmark",
-                            prefixIcon: const Icon(Icons.place),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
+                        inputField(
+                          landmarkController,
+                          "Landmark",
+                          Icons.place,
                         ),
 
-                        const SizedBox(height: 14),
-
-                        TextField(
-                          controller: phoneController,
-                          keyboardType: TextInputType.phone,
-                          decoration: InputDecoration(
-                            labelText: "Phone",
-                            prefixIcon: const Icon(Icons.phone),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
+                        inputField(
+                          phoneController,
+                          "Phone",
+                          Icons.phone,
+                          type: TextInputType.phone,
                         ),
 
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 8),
 
                         /// LOCATION BUTTON
                         SizedBox(
@@ -250,59 +242,66 @@ class _AddRestaurantScreenState extends State<AddRestaurantScreen> {
                               locationDetected
                                   ? "Location Detected ✓"
                                   : "Detect Restaurant Location",
+                              style: const TextStyle(fontSize: 13),
                             ),
 
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFFFF6A00),
                               foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
                           ),
                         ),
-
                       ],
                     ),
                   ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
 
-                  const SizedBox(height: 30),
+      /// STICKY CREATE BUTTON
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
 
-                  /// CREATE RESTAURANT BUTTON
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
+          child: SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
 
-                      onPressed: isLoading ? null : createRestaurant,
+              onPressed: isLoading ? null : createRestaurant,
 
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF6A00),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 18),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-
-                      child: isLoading
-                          ? const CircularProgressIndicator(
-                              color: Colors.white,
-                            )
-                          : const Text(
-                              "Create Restaurant",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 30),
-
-                ],
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFF6A00),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 18),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
               ),
+
+              child: isLoading
+                  ? const SizedBox(
+                      height: 22,
+                      width: 22,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Text(
+                      "Create Restaurant",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
             ),
           ),
         ),

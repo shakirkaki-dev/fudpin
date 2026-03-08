@@ -23,6 +23,9 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
 
   bool saving = false;
 
+  static const primaryOrange = Color(0xFFFF6A00);
+  static const primaryText = Color(0xFF5A3E36);
+
   @override
   void initState() {
     super.initState();
@@ -46,6 +49,19 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
         "value": TextEditingController(),
       });
     });
+  }
+
+  InputDecoration inputStyle(String label, IconData icon) {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: Icon(icon, color: primaryOrange),
+      filled: true,
+      fillColor: Colors.white,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide.none,
+      ),
+    );
   }
 
   Future<void> saveDish() async {
@@ -76,24 +92,15 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
       "specifications": specificationList
     };
 
-    print("CREATE MENU ITEM PAYLOAD:");
-    print(data);
-
     try {
 
-      final response = await ApiService.createMenuItem(data);
-
-      print("CREATE MENU ITEM RESPONSE:");
-      print(response);
+      await ApiService.createMenuItem(data);
 
       if (!mounted) return;
 
       Navigator.pop(context, true);
 
     } catch (e) {
-
-      print("CREATE MENU ERROR:");
-      print(e);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -108,153 +115,217 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
     });
   }
 
+  Widget variantCard(Map<String, TextEditingController> variant) {
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+
+      padding: const EdgeInsets.all(12),
+
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+      ),
+
+      child: Row(
+        children: [
+
+          Expanded(
+            child: TextField(
+              controller: variant["name"],
+              decoration: inputStyle("Variant", Icons.fastfood),
+            ),
+          ),
+
+          const SizedBox(width: 10),
+
+          Expanded(
+            child: TextField(
+              controller: variant["price"],
+              keyboardType: TextInputType.number,
+              decoration: inputStyle("Price", Icons.currency_rupee),
+            ),
+          ),
+
+        ],
+      ),
+    );
+  }
+
+  Widget specificationCard(Map<String, TextEditingController> spec) {
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+
+      padding: const EdgeInsets.all(12),
+
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+      ),
+
+      child: Row(
+        children: [
+
+          Expanded(
+            child: TextField(
+              controller: spec["label"],
+              decoration: inputStyle("Label", Icons.label),
+            ),
+          ),
+
+          const SizedBox(width: 10),
+
+          Expanded(
+            child: TextField(
+              controller: spec["value"],
+              decoration: inputStyle("Value", Icons.notes),
+            ),
+          ),
+
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
+
       appBar: AppBar(
         title: const Text("Add Dish"),
+        backgroundColor: primaryOrange,
+        elevation: 0,
       ),
 
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+      body: Container(
 
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/background_texture.png"),
+            fit: BoxFit.cover,
+          ),
+        ),
 
-            const Text(
-              "Dish Name",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+        child: SingleChildScrollView(
 
-            TextField(
-              controller: nameController,
-            ),
+          padding: const EdgeInsets.all(20),
 
-            const SizedBox(height: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
 
-            const Text(
-              "Description",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-
-            TextField(
-              controller: descriptionController,
-            ),
-
-            const SizedBox(height: 30),
-
-            const Text(
-              "Variants",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+              const Text(
+                "Dish Details",
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: primaryText,
+                ),
               ),
-            ),
 
-            const SizedBox(height: 10),
+              const SizedBox(height: 20),
 
-            ...variants.map((variant) {
-
-              return Row(
-                children: [
-
-                  Expanded(
-                    child: TextField(
-                      controller: variant["name"],
-                      decoration: const InputDecoration(
-                        labelText: "Variant Name",
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(width: 10),
-
-                  Expanded(
-                    child: TextField(
-                      controller: variant["price"],
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: "Price",
-                      ),
-                    ),
-                  ),
-
-                ],
-              );
-
-            }).toList(),
-
-            const SizedBox(height: 10),
-
-            TextButton(
-              onPressed: addVariant,
-              child: const Text("+ Add Variant"),
-            ),
-
-            const SizedBox(height: 30),
-
-            const Text(
-              "Specifications",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+              TextField(
+                controller: nameController,
+                decoration: inputStyle("Dish Name", Icons.restaurant),
               ),
-            ),
 
-            const SizedBox(height: 10),
+              const SizedBox(height: 14),
 
-            ...specifications.map((spec) {
-
-              return Row(
-                children: [
-
-                  Expanded(
-                    child: TextField(
-                      controller: spec["label"],
-                      decoration: const InputDecoration(
-                        labelText: "Label",
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(width: 10),
-
-                  Expanded(
-                    child: TextField(
-                      controller: spec["value"],
-                      decoration: const InputDecoration(
-                        labelText: "Value",
-                      ),
-                    ),
-                  ),
-
-                ],
-              );
-
-            }).toList(),
-
-            const SizedBox(height: 10),
-
-            TextButton(
-              onPressed: addSpecification,
-              child: const Text("+ Add Specification"),
-            ),
-
-            const SizedBox(height: 40),
-
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: saving ? null : saveDish,
-                child: saving
-                    ? const CircularProgressIndicator()
-                    : const Text("Save Dish"),
+              TextField(
+                controller: descriptionController,
+                decoration: inputStyle("Description", Icons.description),
               ),
-            )
 
-          ],
+              const SizedBox(height: 30),
+
+              const Text(
+                "Variants",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: primaryText,
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              ...variants.map((variant) => variantCard(variant)).toList(),
+
+              TextButton.icon(
+                onPressed: addVariant,
+                icon: const Icon(Icons.add, color: primaryOrange),
+                label: const Text(
+                  "Add Variant",
+                  style: TextStyle(color: primaryOrange),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              const Text(
+                "Specifications",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: primaryText,
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              ...specifications
+                  .map((spec) => specificationCard(spec))
+                  .toList(),
+
+              TextButton.icon(
+                onPressed: addSpecification,
+                icon: const Icon(Icons.add, color: primaryOrange),
+                label: const Text(
+                  "Add Specification",
+                  style: TextStyle(color: primaryOrange),
+                ),
+              ),
+
+              const SizedBox(height: 40),
+
+              SizedBox(
+                width: double.infinity,
+
+                child: ElevatedButton(
+
+                  onPressed: saving ? null : saveDish,
+
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryOrange,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+
+                  child: saving
+                      ? const CircularProgressIndicator(
+                          color: Colors.white,
+                        )
+                      : const Text(
+                          "Save Dish",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+            ],
+          ),
         ),
       ),
     );

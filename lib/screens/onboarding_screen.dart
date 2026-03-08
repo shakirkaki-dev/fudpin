@@ -8,9 +8,9 @@ class OnboardingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
+      resizeToAvoidBottomInset: true,
 
-        /// BACKGROUND IMAGE
+      body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage("assets/images/background_texture.png"),
@@ -24,23 +24,27 @@ class OnboardingScreen extends StatelessWidget {
             child: Column(
               children: [
 
-                const SizedBox(height: 30),
+                const SizedBox(height: 10),
 
                 /// FOOD ILLUSTRATION
-                Image.asset(
-                  "assets/images/onboarding_food.png",
-                  height: 220,
+                Flexible(
+                  child: Image.asset(
+                    "assets/images/onboarding_food.png",
+                    fit: BoxFit.contain,
+                  ),
                 ),
 
-                const SizedBox(height: 5),
+                const SizedBox(height: 6),
 
                 /// LOGO
-                Image.asset(
-                  "assets/images/dishway_logo.png",
-                  height: 200,
+                Flexible(
+                  child: Image.asset(
+                    "assets/images/dishway_logo.png",
+                    fit: BoxFit.contain,
+                  ),
                 ),
 
-                const SizedBox(height: 0),
+                const SizedBox(height: 6),
 
                 /// TAGLINE
                 const Text(
@@ -53,7 +57,7 @@ class OnboardingScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
 
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
 
                 /// SUB TEXT
                 const Text(
@@ -65,30 +69,19 @@ class OnboardingScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
 
-                const SizedBox(height: 35),
+                const SizedBox(height: 12),
 
                 /// FEATURES
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: const [
-
-                    FeatureItem(
-                      icon: Icons.search,
-                      label: "Search Dish",
-                    ),
-
-                    FeatureItem(
-                      icon: Icons.location_on,
-                      label: "Nearby",
-                    ),
-
-                    FeatureItem(
-                      icon: Icons.navigation,
-                      label: "Navigate",
-                    ),
+                    FeatureItem(icon: Icons.search, label: "Search Dish"),
+                    FeatureItem(icon: Icons.location_on, label: "Nearby"),
+                    FeatureItem(icon: Icons.navigation, label: "Navigate"),
                   ],
                 ),
 
+                /// pushes buttons to bottom
                 const Spacer(),
 
                 /// CONTINUE AS GUEST
@@ -155,7 +148,7 @@ class OnboardingScreen extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 35),
+                const SizedBox(height: 20),
               ],
             ),
           ),

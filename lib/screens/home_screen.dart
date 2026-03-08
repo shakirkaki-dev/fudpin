@@ -94,7 +94,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: Container(
 
-        /// BACKGROUND TEXTURE
         decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage("assets/images/background_texture.png"),
@@ -106,10 +105,8 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             children: [
 
-              /// FOOD IMAGE + LOGO
-              Container(
-                height: 220,
-                width: double.infinity,
+              /// HEADER IMAGE + LOGO (Flexible)
+              Flexible(
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
@@ -129,14 +126,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     Center(
                       child: Image.asset(
                         "assets/images/dishway_logo.png",
-                        height: 160,
+                        height: 140,
                       ),
                     )
                   ],
                 ),
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
 
               /// SEARCH CARD
               Padding(
@@ -159,12 +156,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
 
-                      /// SEARCH FOOD TITLE
                       sectionTitle("What You Want To Eat Now"),
 
                       const SizedBox(height: 10),
 
-                      /// FOOD INPUT
                       TextField(
                         controller: _foodController,
                         decoration: InputDecoration(
@@ -194,12 +189,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       const SizedBox(height: 20),
 
-                      /// DISTANCE TITLE
                       sectionTitle("Within Distance Of"),
 
                       const SizedBox(height: 10),
 
-                      /// DISTANCE DROPDOWN
                       DropdownButtonFormField<String>(
                         value: _selectedDistance,
                         decoration: InputDecoration(
@@ -235,7 +228,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       const SizedBox(height: 22),
 
-                      /// SEARCH BUTTON
                       SizedBox(
                         width: double.infinity,
                         height: 55,
@@ -262,7 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              const SizedBox(height: 40),
+              const Spacer(),
 
               /// FOOTER
               const Text(
@@ -274,7 +266,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              const SizedBox(height: 0),
+              const SizedBox(height: 12),
             ],
           ),
         ),

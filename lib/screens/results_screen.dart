@@ -34,9 +34,9 @@ class ResultsScreen extends StatelessWidget {
           child: Column(
             children: [
 
-              /// HEADER
+              /// HEADER (FIXED)
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -94,7 +94,7 @@ class ResultsScreen extends StatelessWidget {
                 ),
               ),
 
-              /// RESULTS
+              /// RESULTS LIST (SCROLLABLE)
               Expanded(
                 child: resultsList.isEmpty
                     ? const Center(
@@ -108,7 +108,7 @@ class ResultsScreen extends StatelessWidget {
                         ),
                       )
                     : ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 18),
+                        padding: const EdgeInsets.fromLTRB(18, 6, 18, 20),
                         itemCount: resultsList.length,
                         itemBuilder: (context, index) {
 
@@ -117,16 +117,16 @@ class ResultsScreen extends StatelessWidget {
 
                           return Container(
                             margin: const EdgeInsets.only(bottom: 16),
+
                             child: Material(
                               color: Colors.white,
                               elevation: 4,
-                              shadowColor:
-                                  Colors.black.withOpacity(0.08),
+                              shadowColor: Colors.black.withOpacity(0.08),
                               borderRadius: BorderRadius.circular(18),
+
                               child: InkWell(
                                 borderRadius: BorderRadius.circular(18),
 
-                                /// CARD CLICK
                                 onTap: () {
                                   Navigator.push(
                                     context,
@@ -145,19 +145,17 @@ class ResultsScreen extends StatelessWidget {
 
                                 child: Padding(
                                   padding: const EdgeInsets.all(18),
+
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
 
                                       if (isNearest)
                                         Container(
-                                          margin:
-                                              const EdgeInsets.only(bottom: 8),
-                                          padding:
-                                              const EdgeInsets.symmetric(
-                                                  horizontal: 10,
-                                                  vertical: 4),
+                                          margin: const EdgeInsets.only(bottom: 8),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10,
+                                              vertical: 4),
                                           decoration: BoxDecoration(
                                             color: const Color(0xFFFF6A00)
                                                 .withOpacity(0.15),
@@ -246,8 +244,6 @@ class ResultsScreen extends StatelessWidget {
                                                   BorderRadius.circular(16),
                                             ),
                                           ),
-
-                                          /// BUTTON CLICK
                                           onPressed: () {
                                             Navigator.push(
                                               context,
@@ -261,16 +257,13 @@ class ResultsScreen extends StatelessWidget {
                                                   originalSearchFoodId:
                                                       item["food_item_id"],
                                                   distanceKm:
-                                                      (item["distance_km"] ??
-                                                              0)
+                                                      (item["distance_km"] ?? 0)
                                                           .toDouble(),
                                                 ),
                                               ),
                                             );
                                           },
-
-                                          child: const Text(
-                                              "View More Details"),
+                                          child: const Text("View More Details"),
                                         ),
                                       ),
                                     ],

@@ -75,9 +75,84 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
     );
   }
 
+  /// DELETE ACCOUNT FLOW
+  Future<void> deleteAccount() async {
+
+    final controller = TextEditingController();
+
+    final confirmed = await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Delete Account"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "This action will permanently delete your account and all restaurants.\n\nType DELETE to confirm.",
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(
+                  hintText: "Type DELETE",
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: const Text("Cancel"),
+              onPressed: () => Navigator.pop(context, false),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+              ),
+              child: const Text("Delete"),
+              onPressed: () {
+                if (controller.text == "DELETE") {
+                  Navigator.pop(context, true);
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) return;
+
+    try {
+
+      await ApiService.deleteAccount();
+      await AuthService.clearTokens();
+
+      if (!mounted) return;
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const OnboardingScreen(),
+        ),
+        (route) => false,
+      );
+
+    } catch (e) {
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to delete account"),
+        ),
+      );
+
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: AppBar(
         title: const Text("Owner Dashboard"),
         backgroundColor: const Color(0xFFFF6A00),
@@ -96,7 +171,6 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
         ],
       ),
 
-      /// BACKGROUND
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -107,9 +181,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
 
         child: isLoading
             ? const Center(child: CircularProgressIndicator())
-
             : restaurants.isEmpty
-                /// EMPTY STATE
                 ? Center(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -147,13 +219,11 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
 
                           const SizedBox(height: 35),
 
-                          /// BIG ADD RESTAURANT BUTTON
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton.icon(
                               onPressed: openAddRestaurant,
                               icon: const Icon(Icons.add_business),
-
                               label: const Text(
                                 "Add Your Restaurant",
                                 style: TextStyle(
@@ -161,7 +231,6 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFFFF6A00),
                                 foregroundColor: Colors.white,
@@ -177,7 +246,6 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
                     ),
                   )
 
-                /// RESTAURANT LIST
                 : ListView.builder(
                     padding: const EdgeInsets.only(top: 10),
                     itemCount: restaurants.length,
@@ -190,13 +258,10 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
                           horizontal: 16,
                           vertical: 8,
                         ),
-
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-
                         child: ListTile(
-
                           leading: const CircleAvatar(
                             backgroundColor: Color(0xFFFF6A00),
                             child: Icon(
@@ -204,20 +269,16 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
                               color: Colors.white,
                             ),
                           ),
-
                           title: Text(
                             restaurant["name"],
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-
                           subtitle: Text(
                             restaurant["address"] ?? "",
                           ),
-
                           trailing: const Icon(Icons.arrow_forward_ios),
-
                           onTap: () {
                             openRestaurant(restaurant);
                           },
@@ -227,33 +288,76 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
                   ),
       ),
 
-      /// BIG BUTTON ALSO WHEN RESTAURANTS EXIST
-      bottomNavigationBar: restaurants.isNotEmpty
-          ? Padding(
-              padding: const EdgeInsets.all(16),
-              child: ElevatedButton.icon(
-                onPressed: openAddRestaurant,
-                icon: const Icon(Icons.add_business),
+      /// STICKY BOTTOM BAR
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 8,
+                offset: Offset(0, -2),
+              )
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
 
-                label: const Text(
-                  "Add Another Restaurant",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+              if (restaurants.isNotEmpty)
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: openAddRestaurant,
+                    icon: const Icon(Icons.add_business),
+                    label: const Text(
+                      "Add Another Restaurant",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFF6A00),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
                   ),
                 ),
 
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF6A00),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+              const SizedBox(height: 10),
+
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: deleteAccount,
+                  icon: const Icon(Icons.delete),
+                  label: const Text(
+                    "Delete Account",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
                 ),
               ),
-            )
-          : null,
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

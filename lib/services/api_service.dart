@@ -4,7 +4,7 @@ import 'auth_service.dart';
 
 class ApiService {
 
-  static const String baseUrl = "http://10.0.2.2:8000";
+  static const String baseUrl = "http://192.168.1.8:8000";
 
   // -------------------------
   // AUTH HEADER
@@ -293,6 +293,22 @@ class ApiService {
 
     if (response.statusCode != 200) {
       throw Exception("Failed to delete restaurant");
+    }
+  }
+
+  // -------------------------
+  // DELETE ACCOUNT
+  // -------------------------
+  static Future<void> deleteAccount() async {
+
+    final uri = Uri.parse("$baseUrl/auth/delete-account");
+
+    final headers = await _getAuthHeaders();
+
+    final response = await http.delete(uri, headers: headers);
+
+    if (response.statusCode != 200) {
+      throw Exception("Failed to delete account");
     }
   }
 

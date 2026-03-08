@@ -19,6 +19,9 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
   List variants = [];
   List specifications = [];
 
+  static const primaryOrange = Color(0xFFFF6A00);
+  static const primaryText = Color(0xFF5A3E36);
+
   @override
   void initState() {
     super.initState();
@@ -28,6 +31,19 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
 
     variants = List.from(widget.menuItem["variants"] ?? []);
     specifications = List.from(widget.menuItem["specifications"] ?? []);
+  }
+
+  InputDecoration inputStyle(String label, IconData icon) {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: Icon(icon, color: primaryOrange),
+      filled: true,
+      fillColor: Colors.white,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide.none,
+      ),
+    );
   }
 
   void addVariant() {
@@ -72,46 +88,52 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
 
     final variant = variants[index];
 
-    return Row(
-      children: [
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
 
-        Expanded(
-          child: TextFormField(
-            initialValue: variant["name"],
-            decoration: const InputDecoration(
-              labelText: "Variant Name",
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+      ),
+
+      child: Row(
+        children: [
+
+          Expanded(
+            child: TextFormField(
+              initialValue: variant["name"],
+              decoration: inputStyle("Variant", Icons.fastfood),
+              onChanged: (value) {
+                variant["name"] = value;
+              },
             ),
-            onChanged: (value) {
-              variant["name"] = value;
-            },
           ),
-        ),
 
-        const SizedBox(width: 10),
+          const SizedBox(width: 10),
 
-        Expanded(
-          child: TextFormField(
-            initialValue: variant["price"].toString(),
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: "Price",
+          Expanded(
+            child: TextFormField(
+              initialValue: variant["price"].toString(),
+              keyboardType: TextInputType.number,
+              decoration: inputStyle("Price", Icons.currency_rupee),
+              onChanged: (value) {
+                variant["price"] = double.tryParse(value) ?? 0;
+              },
             ),
-            onChanged: (value) {
-              variant["price"] = double.tryParse(value) ?? 0;
-            },
           ),
-        ),
 
-        IconButton(
-          icon: const Icon(Icons.delete),
-          onPressed: () {
-            setState(() {
-              variants.removeAt(index);
-            });
-          },
-        )
+          IconButton(
+            icon: const Icon(Icons.delete, color: Colors.red),
+            onPressed: () {
+              setState(() {
+                variants.removeAt(index);
+              });
+            },
+          )
 
-      ],
+        ],
+      ),
     );
 
   }
@@ -120,45 +142,51 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
 
     final spec = specifications[index];
 
-    return Row(
-      children: [
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
 
-        Expanded(
-          child: TextFormField(
-            initialValue: spec["label"],
-            decoration: const InputDecoration(
-              labelText: "Label",
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+      ),
+
+      child: Row(
+        children: [
+
+          Expanded(
+            child: TextFormField(
+              initialValue: spec["label"],
+              decoration: inputStyle("Label", Icons.label),
+              onChanged: (value) {
+                spec["label"] = value;
+              },
             ),
-            onChanged: (value) {
-              spec["label"] = value;
-            },
           ),
-        ),
 
-        const SizedBox(width: 10),
+          const SizedBox(width: 10),
 
-        Expanded(
-          child: TextFormField(
-            initialValue: spec["value"],
-            decoration: const InputDecoration(
-              labelText: "Value",
+          Expanded(
+            child: TextFormField(
+              initialValue: spec["value"],
+              decoration: inputStyle("Value", Icons.notes),
+              onChanged: (value) {
+                spec["value"] = value;
+              },
             ),
-            onChanged: (value) {
-              spec["value"] = value;
-            },
           ),
-        ),
 
-        IconButton(
-          icon: const Icon(Icons.delete),
-          onPressed: () {
-            setState(() {
-              specifications.removeAt(index);
-            });
-          },
-        )
+          IconButton(
+            icon: const Icon(Icons.delete, color: Colors.red),
+            onPressed: () {
+              setState(() {
+                specifications.removeAt(index);
+              });
+            },
+          )
 
-      ],
+        ],
+      ),
     );
 
   }
@@ -170,83 +198,139 @@ class _EditMenuItemScreenState extends State<EditMenuItemScreen> {
 
       appBar: AppBar(
         title: const Text("Edit Dish"),
+        backgroundColor: primaryOrange,
+        elevation: 0,
       ),
 
-      body: SingleChildScrollView(
+      body: Container(
 
-        padding: const EdgeInsets.all(16),
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/background_texture.png"),
+            fit: BoxFit.cover,
+          ),
+        ),
 
-        child: Column(
+        child: SingleChildScrollView(
 
-          crossAxisAlignment: CrossAxisAlignment.start,
+          padding: const EdgeInsets.all(20),
 
-          children: [
+          child: Column(
 
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: "Dish Name",
+            crossAxisAlignment: CrossAxisAlignment.start,
+
+            children: [
+
+              const Text(
+                "Dish Details",
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: primaryText,
+                ),
               ),
-            ),
 
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            TextField(
-              controller: _descController,
-              decoration: const InputDecoration(
-                labelText: "Description",
+              TextField(
+                controller: _nameController,
+                decoration: inputStyle("Dish Name", Icons.restaurant),
               ),
-            ),
 
-            const SizedBox(height: 30),
+              const SizedBox(height: 14),
 
-            const Text(
-              "Variants",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-
-            const SizedBox(height: 10),
-
-            ...List.generate(
-              variants.length,
-              (index) => buildVariantRow(index),
-            ),
-
-            TextButton(
-              onPressed: addVariant,
-              child: const Text("+ Add Variant"),
-            ),
-
-            const SizedBox(height: 30),
-
-            const Text(
-              "Specifications",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-
-            const SizedBox(height: 10),
-
-            ...List.generate(
-              specifications.length,
-              (index) => buildSpecificationRow(index),
-            ),
-
-            TextButton(
-              onPressed: addSpecification,
-              child: const Text("+ Add Specification"),
-            ),
-
-            const SizedBox(height: 30),
-
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: updateDish,
-                child: const Text("Update Dish"),
+              TextField(
+                controller: _descController,
+                decoration: inputStyle("Description", Icons.description),
               ),
-            )
 
-          ],
+              const SizedBox(height: 30),
+
+              const Text(
+                "Variants",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: primaryText,
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              ...List.generate(
+                variants.length,
+                (index) => buildVariantRow(index),
+              ),
+
+              TextButton.icon(
+                onPressed: addVariant,
+                icon: const Icon(Icons.add, color: primaryOrange),
+                label: const Text(
+                  "Add Variant",
+                  style: TextStyle(color: primaryOrange),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              const Text(
+                "Specifications",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: primaryText,
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              ...List.generate(
+                specifications.length,
+                (index) => buildSpecificationRow(index),
+              ),
+
+              TextButton.icon(
+                onPressed: addSpecification,
+                icon: const Icon(Icons.add, color: primaryOrange),
+                label: const Text(
+                  "Add Specification",
+                  style: TextStyle(color: primaryOrange),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              SizedBox(
+                width: double.infinity,
+
+                child: ElevatedButton(
+
+                  onPressed: updateDish,
+
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryOrange,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+
+                  child: const Text(
+                    "Update Dish",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+            ],
+          ),
         ),
       ),
     );

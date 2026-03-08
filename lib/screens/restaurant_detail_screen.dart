@@ -291,55 +291,58 @@ class _RestaurantDetailScreenState
         ),
       ),
 
-      /// ACTION BAR
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(16),
-        color: Colors.white,
-        child: Row(
-          children: [
+      /// ACTION BAR (FIXED)
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          color: Colors.white,
+          child: Row(
+            children: [
 
-            Expanded(
-              child: ElevatedButton.icon(
-                onPressed: _callRestaurant,
-                icon: const Icon(Icons.call),
-                label: const Text("Call"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      const Color(0xFFFF6A00),
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(
-                          vertical: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(16),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: _callRestaurant,
+                  icon: const Icon(Icons.call),
+                  label: const Text("Call"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        const Color(0xFFFF6A00),
+                    foregroundColor: Colors.white,
+                    padding:
+                        const EdgeInsets.symmetric(
+                            vertical: 18),
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(16),
+                    ),
                   ),
                 ),
               ),
-            ),
 
-            const SizedBox(width: 14),
+              const SizedBox(width: 14),
 
-            Expanded(
-              child: ElevatedButton.icon(
-                onPressed: _openMaps,
-                icon: const Icon(Icons.navigation),
-                label: const Text("Navigate"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      const Color(0xFFFF6A00),
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(
-                          vertical: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(16),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: _openMaps,
+                  icon: const Icon(Icons.navigation),
+                  label: const Text("Navigate"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        const Color(0xFFFF6A00),
+                    foregroundColor: Colors.white,
+                    padding:
+                        const EdgeInsets.symmetric(
+                            vertical: 18),
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(16),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

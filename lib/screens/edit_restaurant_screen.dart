@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 
 class EditRestaurantScreen extends StatefulWidget {
-
   final Map restaurant;
 
   const EditRestaurantScreen({
@@ -24,6 +23,9 @@ class _EditRestaurantScreenState extends State<EditRestaurantScreen> {
   late TextEditingController phoneController;
 
   bool isSaving = false;
+
+  static const primaryOrange = Color(0xFFFF6A00);
+  static const primaryText = Color(0xFF5A3E36);
 
   @override
   void initState() {
@@ -64,7 +66,14 @@ class _EditRestaurantScreenState extends State<EditRestaurantScreen> {
 
       if (!mounted) return;
 
-      Navigator.pop(context);
+      Navigator.pop(context, {
+        ...widget.restaurant,
+        "name": nameController.text,
+        "description": descriptionController.text,
+        "address": addressController.text,
+        "landmark": landmarkController.text,
+        "phone": phoneController.text,
+      });
 
     } catch (e) {
 
@@ -80,69 +89,143 @@ class _EditRestaurantScreenState extends State<EditRestaurantScreen> {
     });
   }
 
+  InputDecoration inputStyle(String label, IconData icon) {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: Icon(icon, color: primaryOrange),
+      filled: true,
+      fillColor: Colors.white,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide.none,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
       appBar: AppBar(
         title: const Text("Edit Restaurant"),
-        backgroundColor: Colors.orange,
+        backgroundColor: primaryOrange,
+        elevation: 0,
       ),
 
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+      body: Container(
 
-        child: Column(
-          children: [
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/background_texture.png"),
+            fit: BoxFit.cover,
+          ),
+        ),
 
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: "Restaurant Name",
+        child: SingleChildScrollView(
+
+          padding: const EdgeInsets.all(20),
+
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              const Text(
+                "Restaurant Details",
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: primaryText,
+                ),
               ),
-            ),
 
-            TextField(
-              controller: descriptionController,
-              decoration: const InputDecoration(
-                labelText: "Description",
+              const SizedBox(height: 20),
+
+              TextField(
+                controller: nameController,
+                decoration: inputStyle(
+                  "Restaurant Name",
+                  Icons.restaurant,
+                ),
               ),
-            ),
 
-            TextField(
-              controller: addressController,
-              decoration: const InputDecoration(
-                labelText: "Address",
+              const SizedBox(height: 14),
+
+              TextField(
+                controller: descriptionController,
+                decoration: inputStyle(
+                  "Description",
+                  Icons.description,
+                ),
               ),
-            ),
 
-            TextField(
-              controller: landmarkController,
-              decoration: const InputDecoration(
-                labelText: "Landmark",
+              const SizedBox(height: 14),
+
+              TextField(
+                controller: addressController,
+                decoration: inputStyle(
+                  "Address",
+                  Icons.location_on,
+                ),
               ),
-            ),
 
-            TextField(
-              controller: phoneController,
-              decoration: const InputDecoration(
-                labelText: "Phone",
+              const SizedBox(height: 14),
+
+              TextField(
+                controller: landmarkController,
+                decoration: inputStyle(
+                  "Landmark",
+                  Icons.place,
+                ),
               ),
-            ),
 
-            const SizedBox(height: 30),
+              const SizedBox(height: 14),
 
-            ElevatedButton(
-              onPressed: isSaving ? null : saveRestaurant,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
+              TextField(
+                controller: phoneController,
+                keyboardType: TextInputType.phone,
+                decoration: inputStyle(
+                  "Phone Number",
+                  Icons.phone,
+                ),
               ),
-              child: isSaving
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text("Update Restaurant"),
-            )
 
-          ],
+              const SizedBox(height: 30),
+
+              SizedBox(
+                width: double.infinity,
+
+                child: ElevatedButton(
+
+                  onPressed: isSaving ? null : saveRestaurant,
+
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryOrange,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+
+                  child: isSaving
+                      ? const CircularProgressIndicator(
+                          color: Colors.white,
+                        )
+                      : const Text(
+                          "Update Restaurant",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+            ],
+          ),
         ),
       ),
     );
